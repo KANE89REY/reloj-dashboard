@@ -10,19 +10,30 @@ body{
     background:#144147;
     color:white;
     font-family:Arial;
+
     text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+    width:100%;
+    box-sizing:border-box;
+}
+
+.contenedor{
+    text-align:center;
+    width:100%;
 }
 
 .fecha{
     font-size:25px;
     font-weight:bold;
-    margin-top:20px;
+    margin-bottom:10px;
 }
 
 .hora{
     font-size:25px;
     font-weight:bold;
-    margin-top:10px;
 }
 
 </style>
@@ -30,8 +41,10 @@ body{
 
 <body>
 
-<div class="fecha" id="fecha"></div>
-<div class="hora" id="hora"></div>
+<div class="contenedor">
+    <div class="fecha" id="fecha"></div>
+    <div class="hora" id="hora"></div>
+</div>
 
 <script>
 
