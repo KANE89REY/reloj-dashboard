@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+body{
+    margin:0;
+    background:#144147;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+.fecha{
+    font-size:45px;
+    font-weight:bold;
+    margin-top:20px;
+}
+
+.hora{
+    font-size:55px;
+    font-weight:bold;
+    margin-top:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="fecha" id="fecha"></div>
+<div class="hora" id="hora"></div>
+
+<script>
+
+function actualizarHora(){
+
+const meses = [
+"enero","febrero","marzo","abril","mayo","junio",
+"julio","agosto","septiembre","octubre","noviembre","diciembre"
+];
+
+const ahora = new Date();
+
+const fecha =
+ahora.getDate() + " de " +
+meses[ahora.getMonth()] + " de " +
+ahora.getFullYear();
+
+const hora =
+String(ahora.getHours()).padStart(2,'0') + ":" +
+String(ahora.getMinutes()).padStart(2,'0') + ":" +
+String(ahora.getSeconds()).padStart(2,'0');
+
+document.getElementById("fecha").innerHTML = fecha;
+document.getElementById("hora").innerHTML = hora;
+
+}
+
+setInterval(actualizarHora,1000);
+
+actualizarHora();
+
+</script>
+
+</body>
+</html>
