@@ -11,7 +11,7 @@ html, body{
 
 body{
     background:
-        radial-gradient(circle, rgba(0,255,255,.18) 1px, transparent 1px),
+        radial-gradient(circle, rgba(0,255,255,.16) 1px, transparent 1px),
         linear-gradient(135deg, #061b20, #123f46);
     background-size:8px 8px, cover;
     color:white;
@@ -23,94 +23,109 @@ body{
     overflow:hidden;
 }
 
-.reloj{
+.widget{
     position:relative;
-    width:320px;
-    height:190px;
-}
-
-.fecha{
-    position:absolute;
-    left:0;
-    top:62px;
-    width:120px;
-    text-align:right;
-    line-height:1.1;
-}
-
-.dia{
-    font-size:15px;
-    opacity:.85;
-}
-
-.fecha-num{
-    font-size:24px;
-    font-weight:600;
+    width:360px;
+    height:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .circulo{
-    position:absolute;
-    right:0;
-    top:0;
-    width:190px;
-    height:190px;
-    border-radius:50%;
+    position:relative;
+    width:230px;
+    height:230px;
 }
 
 svg{
-    width:190px;
-    height:190px;
+    width:230px;
+    height:230px;
     transform:rotate(-90deg);
 }
 
 .base{
     fill:none;
-    stroke:rgba(255,255,255,.18);
-    stroke-width:5;
+    stroke:rgba(255,255,255,.16);
+    stroke-width:6;
+}
+
+.base2{
+    fill:none;
+    stroke:rgba(255,255,255,.08);
+    stroke-width:2;
 }
 
 .progreso{
     fill:none;
-    stroke:#19e6e6;
-    stroke-width:5;
+    stroke:#18e8e8;
+    stroke-width:6;
     stroke-linecap:round;
-    filter:drop-shadow(0 0 6px #19e6e6);
-    transition:stroke-dashoffset .3s linear;
+    filter:drop-shadow(0 0 8px #18e8e8);
+    transition:stroke-dashoffset .25s linear;
 }
 
 .punto{
     fill:white;
-    filter:drop-shadow(0 0 5px white);
+    filter:drop-shadow(0 0 6px white);
+}
+
+.contenido{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.dia{
+    font-size:13px;
+    font-weight:500;
+    opacity:.85;
+    margin-bottom:2px;
+}
+
+.fecha{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:8px;
 }
 
 .hora{
-    position:absolute;
-    top:67px;
-    left:0;
-    width:190px;
-    text-align:center;
-    font-size:43px;
-    font-weight:700;
+    font-size:42px;
+    font-weight:800;
     letter-spacing:1px;
+    line-height:1;
+}
+
+.zona{
+    font-size:10px;
+    letter-spacing:2px;
+    opacity:.65;
+    margin-top:8px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="reloj">
-    <div class="fecha">
-        <div class="dia" id="dia"></div>
-        <div class="fecha-num" id="fecha"></div>
-    </div>
-
+<div class="widget">
     <div class="circulo">
-        <svg viewBox="0 0 190 190">
-            <circle class="base" cx="95" cy="95" r="78"></circle>
-            <circle class="progreso" id="progreso" cx="95" cy="95" r="78"></circle>
-            <circle class="punto" id="punto" cx="95" cy="17" r="5"></circle>
+        <svg viewBox="0 0 230 230">
+            <circle class="base2" cx="115" cy="115" r="88"></circle>
+            <circle class="base" cx="115" cy="115" r="100"></circle>
+            <circle class="progreso" id="progreso" cx="115" cy="115" r="100"></circle>
+            <circle class="punto" id="punto" cx="115" cy="15" r="5"></circle>
         </svg>
-        <div class="hora" id="hora"></div>
+
+        <div class="contenido">
+            <div class="dia" id="dia"></div>
+            <div class="fecha" id="fecha"></div>
+            <div class="hora" id="hora"></div>
+            <div class="zona">HORA LOCAL</div>
+        </div>
     </div>
 </div>
 
@@ -124,7 +139,8 @@ const meses = [
     "Jul","Ago","Sep","Oct","Nov","Dic"
 ];
 
-const radio = 78;
+const radio = 100;
+const centro = 115;
 const circunferencia = 2 * Math.PI * radio;
 
 const progreso = document.getElementById("progreso");
@@ -136,14 +152,13 @@ function actualizarHora(){
     const segundos = ahora.getSeconds();
     const avance = segundos / 60;
 
-    const offset = circunferencia - avance * circunferencia;
-    progreso.style.strokeDashoffset = offset;
+    progreso.style.strokeDashoffset = circunferencia - avance * circunferencia;
 
     const angulo = avance * 360 - 90;
     const radianes = angulo * Math.PI / 180;
 
-    const x = 95 + radio * Math.cos(radianes);
-    const y = 95 + radio * Math.sin(radianes);
+    const x = centro + radio * Math.cos(radianes);
+    const y = centro + radio * Math.sin(radianes);
 
     document.getElementById("punto").setAttribute("cx", x);
     document.getElementById("punto").setAttribute("cy", y);
@@ -154,7 +169,8 @@ function actualizarHora(){
 
     document.getElementById("hora").innerHTML =
         String(ahora.getHours()).padStart(2,'0') + ":" +
-        String(ahora.getMinutes()).padStart(2,'0');
+        String(ahora.getMinutes()).padStart(2,'0') + ":" +
+        String(ahora.getSeconds()).padStart(2,'0');
 }
 
 setInterval(actualizarHora,1000);
