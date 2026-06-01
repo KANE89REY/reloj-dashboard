@@ -4,80 +4,161 @@
 <meta charset="UTF-8">
 
 <style>
-
 html, body{
     height:100%;
     margin:0;
 }
 
 body{
+    background:
+        radial-gradient(circle, rgba(0,255,255,.18) 1px, transparent 1px),
+        linear-gradient(135deg, #061b20, #123f46);
+    background-size:8px 8px, cover;
     color:white;
-    font-family:'Segoe UI', sans-serif;
-    text-align:center;
+    font-family:'Segoe UI', Arial, sans-serif;
     display:flex;
     align-items:center;
     justify-content:center;
     min-height:100vh;
-    width:100%;
-    box-sizing:border-box;
+    overflow:hidden;
 }
 
-.contenedor{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
+.reloj{
+    position:relative;
+    width:320px;
+    height:190px;
 }
 
 .fecha{
-    font-size:14px;
-    font-weight:500;
-    letter-spacing:3px;
-    text-transform:uppercase;
-    margin-bottom:8px;
-    opacity:.9;
+    position:absolute;
+    left:0;
+    top:62px;
+    width:120px;
+    text-align:right;
+    line-height:1.1;
+}
+
+.dia{
+    font-size:15px;
+    opacity:.85;
+}
+
+.fecha-num{
+    font-size:24px;
+    font-weight:600;
+}
+
+.circulo{
+    position:absolute;
+    right:0;
+    top:0;
+    width:190px;
+    height:190px;
+    border-radius:50%;
+}
+
+svg{
+    width:190px;
+    height:190px;
+    transform:rotate(-90deg);
+}
+
+.base{
+    fill:none;
+    stroke:rgba(255,255,255,.18);
+    stroke-width:5;
+}
+
+.progreso{
+    fill:none;
+    stroke:#19e6e6;
+    stroke-width:5;
+    stroke-linecap:round;
+    filter:drop-shadow(0 0 6px #19e6e6);
+    transition:stroke-dashoffset .3s linear;
+}
+
+.punto{
+    fill:white;
+    filter:drop-shadow(0 0 5px white);
 }
 
 .hora{
-    font-size:58px;
-    font-weight:300;
-    line-height:1;
-    letter-spacing:2px;
+    position:absolute;
+    top:67px;
+    left:0;
+    width:190px;
+    text-align:center;
+    font-size:43px;
+    font-weight:700;
+    letter-spacing:1px;
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="contenedor">
-    <div class="fecha" id="fecha"></div>
-    <div class="hora" id="hora"></div>
+<div class="reloj">
+    <div class="fecha">
+        <div class="dia" id="dia"></div>
+        <div class="fecha-num" id="fecha"></div>
+    </div>
+
+    <div class="circulo">
+        <svg viewBox="0 0 190 190">
+            <circle class="base" cx="95" cy="95" r="78"></circle>
+            <circle class="progreso" id="progreso" cx="95" cy="95" r="78"></circle>
+            <circle class="punto" id="punto" cx="95" cy="17" r="5"></circle>
+        </svg>
+        <div class="hora" id="hora"></div>
+    </div>
 </div>
 
 <script>
+const dias = [
+    "Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"
+];
+
+const meses = [
+    "Ene","Feb","Mar","Abr","May","Jun",
+    "Jul","Ago","Sep","Oct","Nov","Dic"
+];
+
+const radio = 78;
+const circunferencia = 2 * Math.PI * radio;
+
+const progreso = document.getElementById("progreso");
+progreso.style.strokeDasharray = circunferencia;
 
 function actualizarHora(){
-
     const ahora = new Date();
 
-    const fecha =
-        String(ahora.getDate()).padStart(2,'0') + " / " +
-        String(ahora.getMonth()+1).padStart(2,'0') + " / " +
-        ahora.getFullYear();
+    const segundos = ahora.getSeconds();
+    const avance = segundos / 60;
 
-    const hora =
+    const offset = circunferencia - avance * circunferencia;
+    progreso.style.strokeDashoffset = offset;
+
+    const angulo = avance * 360 - 90;
+    const radianes = angulo * Math.PI / 180;
+
+    const x = 95 + radio * Math.cos(radianes);
+    const y = 95 + radio * Math.sin(radianes);
+
+    document.getElementById("punto").setAttribute("cx", x);
+    document.getElementById("punto").setAttribute("cy", y);
+
+    document.getElementById("dia").innerHTML = dias[ahora.getDay()];
+    document.getElementById("fecha").innerHTML =
+        meses[ahora.getMonth()] + " " + String(ahora.getDate()).padStart(2,'0');
+
+    document.getElementById("hora").innerHTML =
         String(ahora.getHours()).padStart(2,'0') + ":" +
-        String(ahora.getMinutes()).padStart(2,'0') + ":" +
-        String(ahora.getSeconds()).padStart(2,'0');
-
-    document.getElementById("fecha").innerHTML = fecha;
-    document.getElementById("hora").innerHTML = hora;
+        String(ahora.getMinutes()).padStart(2,'0');
 }
 
 setInterval(actualizarHora,1000);
 actualizarHora();
-
 </script>
 
 </body>
