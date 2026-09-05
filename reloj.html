@@ -1,107 +1,106 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-
-<style>
-html, body{
-    height:100%;
-    margin:0;
-}
-
-body{
-    background:
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reloj</title>
+  <style>
+    html, body{ height:100%; margin:0; }
+    body{
+      background:
         radial-gradient(circle, rgba(0,255,255,.14) 1px, transparent 1px),
         #0b162a;
-    background-size:8px 8px;
-    color:white;
-    font-family:'Segoe UI', Arial, sans-serif;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-}
-
-.reloj{
-    width:100%;
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
-}
-
-.fecha{
-    font-size:18px;
-    font-weight:700;
-    letter-spacing:1px;
-    text-transform:uppercase;
-    opacity:.9;
-}
-
-.separador{
-    width:2px;
-    height:38px;
-    background:rgba(255,255,255,.35);
-    border-radius:2px;
-}
-
-.hora{
-    font-size:42px;
-    font-weight:800;
-    letter-spacing:2px;
-    line-height:1;
-    text-shadow:0 0 8px rgba(0,255,255,.45);
-}
-
-.pulso{
-    width:10px;
-    height:10px;
-    background:#18e8e8;
-    border-radius:50%;
-    box-shadow:0 0 10px #18e8e8;
-    animation:pulse 1s infinite;
-}
-
-@keyframes pulse{
-    0%{ transform:scale(.8); opacity:.45; }
-    50%{ transform:scale(1.25); opacity:1; }
-    100%{ transform:scale(.8); opacity:.45; }
-}
-</style>
+      background-size:8px 8px;
+      color:white;
+      font-family:'Segoe UI', Arial, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .reloj{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:18px;
+    }
+    .fecha{ font-size:18px; font-weight:700; letter-spacing:1px; text-transform:uppercase; opacity:.9; }
+    .separador{ width:2px; height:38px; background:rgba(255,255,255,.35); border-radius:2px; }
+    .hora{ font-size:42px; font-weight:800; letter-spacing:2px; line-height:1; text-shadow:0 0 8px rgba(0,255,255,.45); }
+    .pulso{ width:10px; height:10px; background:#18e8e8; border-radius:50%; box-shadow:0 0 10px #18e8e8; animation:pulse 1s infinite; }
+    @keyframes pulse{ 0%{ transform:scale(.8); opacity:.45; } 50%{ transform:scale(1.25); opacity:1; } 100%{ transform:scale(.8); opacity:.45; } }
+    /* fallback visible si JS falla */
+    .fallback { color:#f88; font-size:14px; margin-top:8px; text-align:center; }
+  </style>
 </head>
-
 <body>
+  <div class="reloj" role="application" aria-label="Reloj digital">
+    <div>
+      <div class="fecha" id="fecha">-- --</div>
+      <div class="fallback" id="fallback" aria-hidden="true" style="display:none;">JavaScript desactivado o error al cargar</div>
+    </div>
+    <div class="separador" aria-hidden="true"></div>
+    <div class="hora" id="hora">--:--:--</div>
+    <div class="pulso" aria-hidden="true"></div>
+  </div>
 
-<div class="reloj">
-    <div class="fecha" id="fecha"></div>
-    <div class="separador"></div>
-    <div class="hora" id="hora"></div>
-    <div class="pulso"></div>
-</div>
+  <script>
+    const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 
-<script>
-const meses = [
-    "Ene","Feb","Mar","Abr","May","Jun",
-    "Jul","Ago","Sep","Oct","Nov","Dic"
-];
+    function actualizarHora(){
+      try {
+        const ahora = new Date();
+        const elFecha = document.getElementById("fecha");
+        const elHora = document.getElementById("hora");
+        const elFallback = document.getElementById("fallback");
+        if (!elFecha || !elHora) {
+          console.error("No se encontraron los elementos #fecha o #hora");
+          if (elFallback) elFallback.style.display = "block";
+          return;
+        }
 
-function actualizarHora(){
-    const ahora = new Date();
+        const dia = String(ahora.getDate()).padStart(2,'0');
+        const mes = meses[ahora.getMonth()].toUpperCase();
 
-    document.getElementById("fecha").innerHTML =
-    String(ahora.getDate()).padStart(2,'0') + " " +
-    meses[ahora.getMonth()].toUpperCase();
-    
-    document.getElementById("hora").innerHTML =
-        String(ahora.getHours()).padStart(2,'0') + ":" +
-        String(ahora.getMinutes()).padStart(2,'0') + ":" +
-        String(ahora.getSeconds()).padStart(2,'0');
-}
+        elFecha.textContent = `${dia} ${mes}`;
+        elHora.textContent = [
+          String(ahora.getHours()).padStart(2,'0'),
+          String(ahora.getMinutes()).padStart(2,'0'),
+          String(ahora.getSeconds()).padStart(2,'0')
+        ].join(":");
+      } catch (err) {
+        console.error("Error en actualizarHora:", err);
+        const elFallback = document.getElementById("fallback");
+        if (elFallback) elFallback.style.display = "block";
+      }
+    }
 
-setInterval(actualizarHora,1000);
-actualizarHora();
-</script>
+    // Inicia el script cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
 
+    function init(){
+      try {
+        actualizarHora();
+        // Actualiza cada segundo, pero guarda el id por si el usuario quiere parar
+        window.__relojInterval = setInterval(actualizarHora, 1000);
+        console.log("Reloj iniciado correctamente.");
+      } catch (err) {
+        console.error('Error al inicializar el reloj:', err);
+        const elFallback = document.getElementById("fallback");
+        if (elFallback) elFallback.style.display = "block";
+      }
+    }
+
+    // Opcional: limpiar al descargar la página
+    window.addEventListener('beforeunload', () => {
+      if (window.__relojInterval) clearInterval(window.__relojInterval);
+    });
+  </script>
 </body>
 </html>
